@@ -27,7 +27,7 @@ header h1 {
 }
 
 .hero {
-    background-image: url("/static/start.png");
+    background-image: url("/frontend/staticnd/static/start.png");
     background-size: cover;
     background-position: center;
     height: calc(100vh - 100px); /* минус высота header */
