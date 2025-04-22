@@ -1,0 +1,72 @@
+/* Сброс отступов */
+body, html {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    height: 100%;
+    font-family: "Delius Swash Caps", cursive;
+    font-weight: 400;
+    font-style: normal;
+}
+
+/* Header */
+header {
+    background-color: white;
+    padding: 20px;
+    text-align: center;
+}
+
+header h1 {
+    color: #007bff; /* синий */
+    font-family: "Delius Swash Caps", cursive;
+    font-weight: 400;
+    font-style: normal;
+    font-size: 43px;
+    margin: 0;
+    letter-spacing: 2px;
+}
+
+.hero {
+    background-image: url("/static/start.png");
+    background-size: cover;
+    background-position: center;
+    height: calc(100vh - 100px); /* минус высота header */
+
+    display: flex;
+    justify-content: center; /* по горизонтали */
+    align-items: center;     /* по вертикали */
+}
+
+
+/* Полупрозрачный белый блок */
+.info-box {
+    background-color: rgba(255, 255, 255, 0.85);
+    padding: 40px;
+    max-width: 600px;
+    border-radius: 16px;
+    text-align: center;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* Описание */
+.info-box p {
+    font-size: 20px;
+    color: #333;
+    margin-bottom: 30px;
+}
+
+/* Кнопка со стрелкой */
+.btn-arrow {
+    display: inline-block;
+    background-color: #007bff;
+    color: white;
+    padding: 15px 30px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 18px;
+    transition: background-color 0.3s ease;
+}
+
+.btn-arrow:hover {
+    background-color: #0056b3;
+}

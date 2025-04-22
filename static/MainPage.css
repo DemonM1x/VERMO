@@ -1,0 +1,173 @@
+ .button-container {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .btn {
+            padding: 10px 20px;
+            background-color: white;
+            color: black;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .btn:hover {
+            background-color: #007bff;
+        }
+
+        .bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    object-fit: cover;
+    z-index: -1;
+}
+
+.button-container {
+    margin-bottom: 20px;
+}
+
+.btn,
+.start-btn {
+    width: 160px; /* единая ширина для всех */
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: white;
+    color: black;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-align: center;
+    transition: background-color 0.3s ease;
+}
+
+.btn:hover,
+.start-btn:hover {
+    background-color: #007bff;
+    color: white;
+}
+
+/* Белый контейнер для отображения волны */
+.waveform-container {
+    width: 620px;
+    height: 220px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+}
+
+/* Сброс отступов */
+body, html {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    height: 100%;
+    font-family: "Delius Swash Caps", cursive;
+    font-weight: 400;
+    font-style: normal;
+}
+
+/* Header */
+header {
+    background-color: white;
+    padding: 20px;
+    text-align: center;
+}
+
+header h1 {
+    color: #007bff; /* синий */
+    font-family: "Delius Swash Caps", cursive;
+    font-weight: 400;
+    font-style: normal;
+    font-size: 43px;
+    margin: 0;
+    letter-spacing: 2px;
+}
+
+.hero {
+    background-image: url("/static/start.png");
+    background-size: cover;
+    background-position: center;
+    height: calc(100vh - 100px); /* минус высота header */
+    position: relative; /* важно для абсолютных потомков */
+}
+
+/* Абсолютное позиционирование канваса */
+#waveform {
+    position: absolute;
+    top: 30px; /* отступ от верха .hero */
+    left: 50%;
+    transform: translateX(-50%);
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    width: 95%;
+    height: 150px;
+    padding: 10px;
+    z-index: 2; /* выше фона */
+}
+
+
+.overlay-box {
+    position: absolute;
+    top: 65%;
+    right: 2%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.info-panel {
+    background-color: rgba(255, 255, 255, 0.8); /* полупрозрачный белый */
+    padding: 150px 200px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    margin-bottom: 15px;
+    max-width: 700px;
+}
+
+/* Основной стиль для панели помощи */
+.help-panel {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 300px;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: none; /* Скрыта по умолчанию */
+    z-index: 999;
+    color: white;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+/* Контент внутри панели помощи */
+.help-content {
+    position: relative;
+    overflow-y: auto;
+    height: 100%;
+}
+
+/* Кнопка закрытия */
+.close-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: transparent;
+    border: none;
+    color: white;
+    font-size: 30px;
+    cursor: pointer;
+}
