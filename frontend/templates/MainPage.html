@@ -2,20 +2,31 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>SEREMO</title>
+    <title>VEREMO</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='MainPage.css') }}">
 </head>
 <body>
-    <header>
-        <h1>SEREMO</h1>
-    </header>
+<header>
+    <h1>VEREMO</h1>
+</header>
 
-    <div class="hero">
-        <canvas id="waveform" width="1000" height="150"></canvas>
+<div class="hero">
+    <canvas id="waveform" width="1000" height="150"></canvas>
 
-        <div class="overlay-box">
-            <div class="info-panel">
-                <p>Здесь может быть информация или инструкции</p>
+    <div class="overlay-box">
+        <div class="info-panel">
+            <p>Здесь может быть информация или инструкции</p>
+        </div>
+
+        <div class="button-group">
+            <div class="dropdown">
+                <button class="dropdown-toggle" id="dropdownToggle">Выбрать режим</button>
+                <ul class="dropdown-menu" id="dropdownMenu">
+                    <li data-value="cnn">CNN</li>
+                    <li data-value="rnn">RNN</li>
+                    <li data-value="rf">Random Forest</li>
+                    <li data-value="hmm">HMM</li>
+                </ul>
             </div>
             <button class="start-btn">Старт</button>
         </div>
@@ -32,13 +43,16 @@
 
     <input type="file" id="importFile" accept="audio/*" style="display: none;">
 
-     <!-- Панель помощи -->
+    <!-- Панель помощи -->
     <div id="helpPanel" class="help-panel">
         <div class="help-content">
             <button id="closeHelp" class="close-btn">×</button>
             <h2>Помощь</h2>
-            <p>Для того, чтобы определить эмоции необходимо сделать запись аудио и нажать на кнопку "Запись", либо импортировать готовое аудио и нажать на кнопку "Импорт". Затем нажать на кнопку "Старт" и приложение определит вашу эмоцию.</p>
-                <p>Дополнение: вы можете прослушать записанное или импортированное аудио нажав на кнопку "Прослушать". Для нового аудио нажмите на кнопку "Очистить".</p>
+            <p>Для того, чтобы определить эмоции необходимо сделать запись аудио и нажать на кнопку "Запись", либо
+                импортировать готовое аудио и нажать на кнопку "Импорт". Затем нажать на кнопку "Старт" и приложение
+                определит вашу эмоцию.</p>
+            <p>Дополнение: вы можете прослушать записанное или импортированное аудио нажав на кнопку "Прослушать". Для
+                нового аудио нажмите на кнопку "Очистить".</p>
         </div>
     </div>
 

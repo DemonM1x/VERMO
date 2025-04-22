@@ -13,6 +13,23 @@ let recordedChunks = [];
 let recordedBlob = null;
 let playAudio = null;
 
+// Обработчик для раскрытия и скрытия меню
+document.getElementById("dropdownToggle").addEventListener("click", function() {
+    const dropdownMenu = document.getElementById("dropdownMenu");
+    dropdownMenu.classList.toggle("show");
+});
+
+// Обработчик для выбора элемента в меню
+const menuItems = document.querySelectorAll(".dropdown-menu li");
+menuItems.forEach(item => {
+    item.addEventListener("click", function() {
+        const selectedValue = this.getAttribute("data-value");
+        document.getElementById("dropdownToggle").textContent = this.textContent; // Меняем текст на кнопке
+        document.getElementById("dropdownMenu").classList.remove("show"); // Закрываем меню после выбора
+        console.log("Выбран режим: " + selectedValue); // В дальнейшем можно использовать выбранное значение
+    });
+});
+
 canvas.addEventListener("click", function (e) {
     if (!recordedBlob) return;
 

@@ -33,8 +33,7 @@
     margin-bottom: 20px;
 }
 
-.btn,
-.start-btn {
+.btn{
     width: 160px; /* единая ширина для всех */
     padding: 10px 20px;
     font-size: 16px;
@@ -48,6 +47,7 @@
 }
 
 .btn:hover,
+.dropdown-toggle:hover,
 .start-btn:hover {
     background-color: #007bff;
     color: white;
@@ -95,7 +95,7 @@ header h1 {
 }
 
 .hero {
-    background-image: url("/frontend/staticnd/static/start.png");
+    background-image: url("/static/start.png");
     background-size: cover;
     background-position: center;
     height: calc(100vh - 100px); /* минус высота header */
@@ -105,7 +105,7 @@ header h1 {
 /* Абсолютное позиционирование канваса */
 #waveform {
     position: absolute;
-    top: 30px; /* отступ от верха .hero */
+    top: 20px; /* отступ от верха .hero */
     left: 50%;
     transform: translateX(-50%);
     background: white;
@@ -170,4 +170,67 @@ header h1 {
     color: white;
     font-size: 30px;
     cursor: pointer;
+}
+
+.button-group {
+    display: flex;
+    justify-content: center;
+    gap: 100px; /* Небольшое расстояние между кнопками */
+}
+
+.dropdown-toggle,
+.start-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 50px;         /* Одинаковая высота для всех кнопок */
+    width: 160px;         /* Одинаковая ширина для всех кнопок */
+    padding: 0 20px;
+    font-size: 16px;
+    background-color: white;
+    color: black;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-align: center;
+    transition: background-color 0.3s ease;
+}
+
+.dropdown {
+    position: relative;
+}
+
+.dropdown-menu {
+    display: none;
+    position: absolute;
+    bottom: 100%; /* <-- Главное отличие: меню выходит НАВЕРХ */
+    left: 0;
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    list-style: none;
+    padding: 0;
+    width: 100%;
+    z-index: 1000;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    opacity: 0;
+    transform: translateY(10px); /* немного сдвинем */
+    pointer-events: none;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.dropdown-menu.show {
+    display: block;
+    opacity: 1;
+    transform: translateY(0); /* убираем сдвиг при показе */
+    pointer-events: auto;
+}
+
+.dropdown-menu li {
+    padding: 10px 20px;
+    cursor: pointer;
+}
+
+.dropdown-menu li:hover {
+    background-color: #f0f0f0;
 }
