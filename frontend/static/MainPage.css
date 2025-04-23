@@ -277,16 +277,20 @@ header h1 {
     word-break: break-all;
 }
 .history-table th:nth-child(1), .history-table td:nth-child(1) {
-    width: 260px;
-    max-width: 260px;
+    width: 200px;
+    max-width: 200px;
 }
 .history-table th:nth-child(2), .history-table td:nth-child(2) {
-    width: 110px;
-    max-width: 110px;
+    width: 90px;
+    max-width: 90px;
 }
 .history-table th:nth-child(3), .history-table td:nth-child(3) {
-    width: 110px;
-    max-width: 110px;
+    width: 90px;
+    max-width: 90px;
+}
+.history-table th:nth-child(4), .history-table td:nth-child(4) {
+    width: 90px;
+    max-width: 90px;
 }
 .history-table th {
     background: #f5f7fa;

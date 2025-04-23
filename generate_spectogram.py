@@ -11,7 +11,7 @@ with open(labels_path, 'w', newline='') as csvfile:
     writer = csv.writer(csvfile)
     writer.writerow(['filename', 'label'])
 
-    for root, dirs, files in os.walk('data/dusha'):
+    for root, dirs, files in os.walk('data/emotions'):
         for file in files:
             if file.endswith('.wav') or file.endswith('.mp3'):
                 path = os.path.join(root, file)
@@ -24,3 +24,4 @@ with open(labels_path, 'w', newline='') as csvfile:
                 spec_filename = os.path.splitext(file)[0] + '.npy'
                 np.save(os.path.join(spec_dir, spec_filename), mel_db)
                 writer.writerow([spec_filename, label])
+

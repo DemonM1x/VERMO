@@ -6,7 +6,7 @@ import numpy as np
 from pydub import AudioSegment
 import tempfile
 from denoise import denoise_combined
-from ml.predict import predict_emotion_cnn
+from ml.predict import predict_emotion_cnn, predict_emotion_rnn, predict_emotion_rf, predict_emotion_hmm
 
 app = Flask(__name__)
 CORS(app)
@@ -60,6 +60,12 @@ def process_audio():
         emotion = None
         if model == 'cnn':
             emotion = predict_emotion_cnn(mel_spec)
+        elif model == 'rnn':
+            emotion = predict_emotion_rnn(mel_spec)
+        elif model == 'rf':
+            emotion = predict_emotion_rf(mel_spec)
+        elif model == 'hmm':
+            emotion = predict_emotion_hmm(mel_spec)
         if wav_path != filename:
             os.remove(wav_path)  # Удаляем временный файл
     except Exception as e:

@@ -50,12 +50,12 @@ const historyTable = document.getElementById('history-table').querySelector('tbo
 const historyTableWrapper = document.getElementById('history-table').parentElement;
 let historyRecords = [];
 
-function addHistoryRecord(filename, duration, emotion) {
-    // Проверка на дубликаты по названию файла и эмоции
-    if (historyRecords.some(r => r.filename === filename && r.emotion === emotion)) return;
-    historyRecords.push({ filename, duration, emotion });
+function addHistoryRecord(filename, duration, emotion, model) {
+    // Проверка на дубликаты по названию файла и эмоции и модели
+    if (historyRecords.some(r => r.filename === filename && r.emotion === emotion && r.model === model)) return;
+    historyRecords.push({ filename, duration, emotion, model });
     const row = document.createElement('tr');
-    row.innerHTML = `<td>${filename}</td><td>${duration}</td><td>${emotion}</td>`;
+    row.innerHTML = `<td>${filename}</td><td>${duration}</td><td>${emotion}</td><td>${model}</td>`;
     historyTable.appendChild(row);
 }
 
@@ -321,7 +321,7 @@ startBtn.addEventListener('click', async () => {
             duration = await getAudioDuration(recordedBlob);
             duration = (duration && isFinite(duration)) ? duration.toFixed(2) : '-';
         }
-        addHistoryRecord(filename, duration, result.emotion || '-');
+        addHistoryRecord(filename, duration, result.emotion || '-', result.model || selectedModel);
     } catch (error) {
         showError('Произошла ошибка при обработке аудио');
     }
