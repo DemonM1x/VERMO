@@ -129,13 +129,16 @@ header h1 {
 }
 
 .info-panel {
-    background-color: rgba(255, 255, 255, 0.8); /* полупрозрачный белый */
-    padding: 150px 200px;
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 100px 100px;
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     text-align: center;
     margin-bottom: 15px;
-    max-width: 700px;
+    max-width: 600px;
+    max-height: 200px;
+    overflow-y: auto;
+    position: relative;
 }
 
 /* Основной стиль для панели помощи */
@@ -233,4 +236,74 @@ header h1 {
 
 .dropdown-menu li:hover {
     background-color: #f0f0f0;
+}
+
+.error-message {
+    color: #dc3545;
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 10px;
+    border-radius: 5px;
+    margin: 10px 0;
+    display: none;
+    text-align: center;
+}
+
+.history-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    max-height: 200px;
+    display: block;
+    overflow-y: auto;
+}
+.history-table thead, .history-table tbody {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+}
+.history-table tbody {
+    display: block;
+    max-height: 160px;
+    overflow-y: auto;
+}
+.history-table th, .history-table td {
+    padding: 10px 16px;
+    text-align: center;
+    border-bottom: 1px solid #e0e0e0;
+    word-break: break-all;
+}
+.history-table th:nth-child(1), .history-table td:nth-child(1) {
+    width: 260px;
+    max-width: 260px;
+}
+.history-table th:nth-child(2), .history-table td:nth-child(2) {
+    width: 110px;
+    max-width: 110px;
+}
+.history-table th:nth-child(3), .history-table td:nth-child(3) {
+    width: 110px;
+    max-width: 110px;
+}
+.history-table th {
+    background: #f5f7fa;
+    color: #007bff;
+    font-weight: 600;
+}
+.history-table tr:last-child td {
+    border-bottom: none;
+}
+
+/* Кастомный скролл для таблицы */
+.info-panel::-webkit-scrollbar, .history-table tbody::-webkit-scrollbar {
+    width: 8px;
+    background: #f5f7fa;
+    border-radius: 4px;
+}
+.info-panel::-webkit-scrollbar-thumb, .history-table tbody::-webkit-scrollbar-thumb {
+    background: #b3c6e0;
+    border-radius: 4px;
 }

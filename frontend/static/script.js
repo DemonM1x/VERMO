@@ -1,5 +1,6 @@
 const canvas = document.getElementById("waveform");
 const ctx = canvas.getContext("2d");
+const base_url = "http://127.0.0.1:8080";
 
 let audioContext;
 let analyser;
@@ -44,38 +45,64 @@ canvas.addEventListener("click", function (e) {
     playAudio.play();
 });
 
+// История анализов
+const historyTable = document.getElementById('history-table').querySelector('tbody');
+const historyTableWrapper = document.getElementById('history-table').parentElement;
+let historyRecords = [];
+
+function addHistoryRecord(filename, duration, emotion) {
+    // Проверка на дубликаты по названию файла и эмоции
+    if (historyRecords.some(r => r.filename === filename && r.emotion === emotion)) return;
+    historyRecords.push({ filename, duration, emotion });
+    const row = document.createElement('tr');
+    row.innerHTML = `<td>${filename}</td><td>${duration}</td><td>${emotion}</td>`;
+    historyTable.appendChild(row);
+}
+
+function clearHistoryTable() {
+    historyRecords = [];
+    historyTable.innerHTML = '';
+}
+
+// Генерация уникального имени для записи
+function generateRecordName() {
+    const now = new Date();
+    const pad = n => n.toString().padStart(2, '0');
+    return `record_${now.getFullYear()}${pad(now.getMonth()+1)}${pad(now.getDate())}_${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}.webm`;
+}
+
+// Для записи с микрофона сохраняем имя и время
+let lastRecordName = '';
+let recordStartTime = null;
+let recordStopTime = null;
+
 function startRecording() {
     clearCanvas();
-
+    lastRecordName = generateRecordName();
+    recordStartTime = Date.now();
     navigator.mediaDevices.getUserMedia({ audio: true })
         .then(mediaStream => {
             stream = mediaStream;
-
             mediaRecorder = new MediaRecorder(mediaStream);
             recordedChunks = [];
-
             mediaRecorder.ondataavailable = e => {
                 if (e.data.size > 0) recordedChunks.push(e.data);
             };
-
             mediaRecorder.onstop = () => {
+                recordStopTime = Date.now();
                 recordedBlob = new Blob(recordedChunks, { type: "audio/webm" });
-
-                // Показать кнопку прослушивания
+                recordedBlob.name = lastRecordName;
+                // Сохраняем длительность записи
+                recordedBlob.duration = ((recordStopTime - recordStartTime) / 1000).toFixed(2);
                 document.getElementById("listenBtn").style.display = "inline-block";
             };
-
             mediaRecorder.start();
-
             audioContext = new (window.AudioContext || window.webkitAudioContext)();
             analyser = audioContext.createAnalyser();
             analyser.fftSize = 1024;
-
             source = audioContext.createMediaStreamSource(mediaStream);
             source.connect(analyser);
-
             dataArray = new Uint8Array(analyser.frequencyBinCount);
-
             drawWaveform();
         })
         .catch(err => {
@@ -142,37 +169,24 @@ function clearCanvas() {
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 }
 
-// Очистка
-document.getElementById("clearBtn").addEventListener("click", () => {
-    clearCanvas();
-    recordedChunks = [];
-    recordedBlob = null;
-    document.getElementById("listenBtn").style.display = "none"; // Скрыть кнопку прослушивания
-});
-
 // Импорт
+let importedFileName = '';
 document.getElementById("importBtn").addEventListener("click", () => {
     document.getElementById("importFile").click();
 });
-
 document.getElementById("importFile").addEventListener("change", function () {
     const file = this.files[0];
     if (!file) return;
-
+    importedFileName = file.name;
     const reader = new FileReader();
     reader.onload = function (e) {
         const arrayBuffer = e.target.result;
-
         const context = new (window.AudioContext || window.webkitAudioContext)();
         context.decodeAudioData(arrayBuffer)
             .then(audioBuffer => {
-                // Сохраняем blob для кнопки воспроизведения
                 recordedBlob = file;
-
-                // Показать кнопку прослушивания
+                recordedBlob.name = importedFileName;
                 document.getElementById("listenBtn").style.display = "inline-block";
-
-                // Отображаем waveform
                 drawImportedWaveform(audioBuffer);
             })
             .catch(err => {
@@ -246,3 +260,94 @@ document.getElementById("closeHelp").addEventListener("click", () => {
 // Кнопки
 document.getElementById("recordBtn").addEventListener("click", startRecording);
 document.getElementById("stopBtn").addEventListener("click", stopRecording);
+
+// Функция для отображения ошибки
+function showError(message) {
+    const errorElement = document.getElementById('error-message');
+    errorElement.textContent = message;
+    errorElement.style.display = 'block';
+}
+
+// Функция для скрытия ошибки
+function hideError() {
+    const errorElement = document.getElementById('error-message');
+    errorElement.style.display = 'none';
+}
+
+// Функция для отправки данных на сервер
+async function sendDataToServer(audioBlob, model) {
+    const formData = new FormData();
+    formData.append('audio', audioBlob);
+    formData.append('model', model);
+
+    try {
+        const response = await fetch(`${base_url}/newRecord`, {
+            method: 'POST',
+            body: formData
+        });
+        
+        if (!response.ok) {
+            throw new Error('Ошибка при отправке данных');
+        }
+        
+        return await response.json();
+    } catch (error) {
+        console.error('Ошибка:', error);
+        throw error;
+    }
+}
+
+// Модифицируем обработчик кнопки Старт
+const startBtn = document.querySelector('.start-btn');
+startBtn.addEventListener('click', async () => {
+    hideError();
+    if (!recordedBlob) {
+        showError('Сначала запишите или импортируйте аудио');
+        return;
+    }
+    const selectedModel = document.getElementById('dropdownToggle').textContent;
+    if (selectedModel === 'Выбрать режим') {
+        showError('Выберите модель для анализа');
+        return;
+    }
+    try {
+        const result = await sendDataToServer(recordedBlob, selectedModel);
+        // Получаем имя файла и длительность
+        let filename = recordedBlob.name || generateRecordName();
+        let duration = '-';
+        if (typeof recordedBlob.duration !== 'undefined') {
+            duration = recordedBlob.duration;
+        } else {
+            duration = await getAudioDuration(recordedBlob);
+            duration = (duration && isFinite(duration)) ? duration.toFixed(2) : '-';
+        }
+        addHistoryRecord(filename, duration, result.emotion || '-');
+    } catch (error) {
+        showError('Произошла ошибка при обработке аудио');
+    }
+});
+
+// Получение длительности аудио
+function getAudioDuration(blob) {
+    return new Promise(resolve => {
+        const audio = document.createElement('audio');
+        audio.preload = 'metadata';
+        audio.onloadedmetadata = function() {
+            resolve(audio.duration);
+        };
+        audio.onerror = function() {
+            resolve(0);
+        };
+        audio.src = URL.createObjectURL(blob);
+    });
+}
+
+// Очистка истории по кнопке Очистка
+const clearBtn = document.getElementById('clearBtn');
+clearBtn.addEventListener('click', () => {
+    clearCanvas();
+    recordedChunks = [];
+    recordedBlob = null;
+    document.getElementById('listenBtn').style.display = 'none';
+    clearHistoryTable();
+});
