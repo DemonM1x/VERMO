@@ -19,7 +19,7 @@ def build_rnn_model(input_shape=(128, 128, 1), num_classes=8):
     return model
 
 
-def load_rnn_model(model_path='models/rnn_emotions.h5', input_shape=(128, 128, 1)):
+def load_rnn_model(model_path='models/rnn_emotions.keras', input_shape=(128, 128, 1)):
     try:
         model = tf.keras.models.load_model(model_path)
     except Exception:

@@ -20,7 +20,7 @@ def build_cnn_model(input_shape=(128, 128, 1), num_classes=8):
     return model
 
 
-def load_cnn_model(model_path='models/cnn_emotions.h5', input_shape=(128, 128, 1)):
+def load_cnn_model(model_path='models/cnn_emotions.keras', input_shape=(128, 128, 1)):
     try:
         model = tf.keras.models.load_model(model_path)
     except Exception:

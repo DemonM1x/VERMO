@@ -42,7 +42,10 @@ y = np.array([emotions.index(lbl) for lbl in y])
 
 if len(X) < 2:
     raise ValueError('Недостаточно данных для обучения модели!')
-
+indices = np.arange(len(X))
+np.random.shuffle(indices)
+X = X[indices]
+y = y[indices]
 model = build_cnn_model(input_shape=(128, 128, 1), num_classes=len(emotions))
 model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
 model.fit(X, y, epochs=20, batch_size=32, validation_split=0.2)
