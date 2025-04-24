@@ -1,10 +1,12 @@
-from flask import Flask, request, jsonify
-from flask_cors import CORS
 import os
+import tempfile
+
 import librosa
 import numpy as np
+from flask import Flask, request, jsonify
+from flask_cors import CORS
 from pydub import AudioSegment
-import tempfile
+
 from denoise import denoise_combined
 from ml.predict import predict_emotion_cnn, predict_emotion_rnn, predict_emotion_rf, predict_emotion_hmm
 
@@ -21,20 +23,26 @@ def convert_to_wav(src_path):
     ext = os.path.splitext(src_path)[1].lower()
     if ext == '.wav':
         return src_path  # WAV не трогаем
-    # Конвертируем в WAV через pydub
-    audio = AudioSegment.from_file(src_path)
-    tmp_wav = tempfile.NamedTemporaryFile(suffix='.wav', delete=False)
-    audio.export(tmp_wav.name, format='wav')
-    return tmp_wav.name
+    try:
+        # Конвертируем в WAV через pydub
+        audio = AudioSegment.from_file(src_path)
+        tmp_wav = tempfile.NamedTemporaryFile(suffix='.wav', delete=False)
+        audio.export(tmp_wav.name, format='wav')
+        return tmp_wav.name
+    except Exception as e:
+        raise ValueError(f"Ошибка при конвертации аудио: {str(e)}")
 
 
 def audio_to_melspectrogram(filepath, sr=22050, n_mels=128):
-    y, sr = librosa.load(filepath, sr=sr)
-    # Комбинированное подавление шума
-    y = denoise_combined(y, sr)
-    S = librosa.feature.melspectrogram(y=y, sr=sr, n_mels=n_mels)
-    S_db = librosa.power_to_db(S, ref=np.max)
-    return S_db
+    try:
+        y, sr = librosa.load(filepath, sr=sr)
+        # Комбинированное подавление шума
+        y = denoise_combined(y, sr)
+        S = librosa.feature.melspectrogram(y=y, sr=sr, n_mels=n_mels)
+        S_db = librosa.power_to_db(S, ref=np.max)
+        return S_db
+    except Exception as e:
+        raise ValueError(f"Ошибка при создании спектрограммы: {str(e)}")
 
 
 @app.route('/newRecord', methods=['POST'])
