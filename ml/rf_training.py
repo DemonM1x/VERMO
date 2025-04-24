@@ -44,14 +44,18 @@ for file in os.listdir(spec_dir):
 
 emotions = sorted(list(emotions))
 X = np.array(X)
+y = np.array(y)
 y_indices = np.array([emotions.index(lbl) for lbl in y])
 
 if len(X) < 2:
     raise ValueError('Недостаточно данных для обучения модели!')
+
+# Перемешиваем данные
 indices = np.arange(len(X))
 np.random.shuffle(indices)
 X = X[indices]
-y = y[indices]
+y_indices = y_indices[indices]
+
 clf = RandomForestClassifier(n_estimators=50, random_state=42, max_depth=16)
 clf.fit(X, y_indices)
 joblib.dump({'model': clf, 'emotions': emotions}, 'models/rf_emotions.pkl')

@@ -2,7 +2,7 @@ import tensorflow as tf
 from tensorflow.keras import layers, models
 import numpy as np
 
-EMOTIONS = ['angry', 'happy', 'sad', 'neutral', 'fear', 'disgust', 'surprise', 'calm']
+EMOTIONS = ['Angry', 'Happy', 'Sad', 'Neutral', 'Fearful', 'Disgusted', 'Surprised']
 
 
 def build_rnn_model(input_shape=(128, 128, 1), num_classes=8):

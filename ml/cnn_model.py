@@ -2,7 +2,7 @@ import tensorflow as tf
 import tensorflow.keras as keras
 import numpy as np
 
-EMOTIONS = ['angry', 'happy', 'sad', 'neutral', 'fear', 'disgust', 'surprise', 'calm']
+EMOTIONS = ['Angry', 'Happy', 'Sad', 'Neutral', 'Fearful', 'Disgusted', 'Surprised']
 
 
 def build_cnn_model(input_shape=(128, 128, 1), num_classes=8):
