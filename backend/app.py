@@ -58,14 +58,15 @@ def process_audio():
         mel_spec = audio_to_melspectrogram(wav_path)
         mel_shape = mel_spec.shape
         emotion = None
+        probs = None
         if model == 'cnn':
-            emotion = predict_emotion_cnn(mel_spec)
+            emotion, probs = predict_emotion_cnn(mel_spec)
         elif model == 'rnn':
-            emotion = predict_emotion_rnn(mel_spec)
-        elif model == 'rf':
-            emotion = predict_emotion_rf(mel_spec)
+            emotion, probs = predict_emotion_rnn(mel_spec)
+        elif model == 'random forest':
+            emotion, probs = predict_emotion_rf(mel_spec)
         elif model == 'hmm':
-            emotion = predict_emotion_hmm(mel_spec)
+            emotion, probs = predict_emotion_hmm(mel_spec)
         if wav_path != filename:
             os.remove(wav_path)  # Удаляем временный файл
     except Exception as e:
@@ -76,7 +77,8 @@ def process_audio():
         'model': model,
         'message': 'Файл успешно обработан',
         'mel_shape': mel_shape,
-        'emotion': emotion
+        'emotion': emotion,
+        'probs': probs
     })
 
 

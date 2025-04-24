@@ -15,8 +15,8 @@ with open(labels_path, 'w', newline='') as csvfile:
         for file in files:
             if file.endswith('.wav') or file.endswith('.mp3'):
                 path = os.path.join(root, file)
-                # Извлекаем метку из имени файла или структуры папок
-                label = ...  # например, file.split('_')[0]
+                # Метка = имя директории, в которой лежит файл
+                label = os.path.basename(root)
                 mel = librosa.feature.melspectrogram(
                     y=librosa.load(path, sr=22050)[0], sr=22050, n_mels=128)
                 mel_db = librosa.power_to_db(mel, ref=np.max)
@@ -24,4 +24,3 @@ with open(labels_path, 'w', newline='') as csvfile:
                 spec_filename = os.path.splitext(file)[0] + '.npy'
                 np.save(os.path.join(spec_dir, spec_filename), mel_db)
                 writer.writerow([spec_filename, label])
-

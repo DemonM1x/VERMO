@@ -311,3 +311,64 @@ header h1 {
     background: #b3c6e0;
     border-radius: 4px;
 }
+
+.loader-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255,255,255,0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+}
+.loader {
+    position: relative;
+    width: 48px;
+    height: 48px;
+    border: 6px solid #f3f3f3;
+    border-top: 6px solid #007bff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    background: transparent;
+}
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.chart-modal {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.4);
+    z-index: 3000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.chart-modal-content {
+    background: #fff;
+    border-radius: 12px;
+    padding: 32px 32px 16px 32px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+    position: relative;
+    min-width: 340px;
+    min-height: 340px;
+    text-align: center;
+}
+.close-chart-modal {
+    position: absolute;
+    top: 12px;
+    right: 18px;
+    font-size: 32px;
+    color: #007bff;
+    cursor: pointer;
+    font-weight: bold;
+}
+#emotions-values {
+    margin-top: 18px;
+    font-size: 16px;
+    color: #333;
+}

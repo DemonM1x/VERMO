@@ -27,6 +27,9 @@
                 <tbody>
                 </tbody>
             </table>
+            <div id="loader-overlay" class="loader-overlay" style="display: none;">
+                <div id="loader" class="loader"></div>
+            </div>
         </div>
 
         <div id="error-message" class="error-message"></div>
@@ -66,6 +69,14 @@
                 определит вашу эмоцию.</p>
             <p>Дополнение: вы можете прослушать записанное или импортированное аудио нажав на кнопку "Прослушать". Для
                 нового аудио нажмите на кнопку "Очистить".</p>
+        </div>
+    </div>
+
+    <div id="chart-modal" class="chart-modal" style="display:none;">
+        <div class="chart-modal-content">
+            <span id="close-chart-modal" class="close-chart-modal">&times;</span>
+            <canvas id="emotions-pie-chart" width="320" height="320"></canvas>
+            <div id="emotions-values"></div>
         </div>
     </div>
 

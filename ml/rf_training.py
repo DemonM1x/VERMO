@@ -3,15 +3,25 @@ import numpy as np
 from sklearn.ensemble import RandomForestClassifier
 import joblib
 import librosa
+import csv
 
 spec_dir = '../data/specs'
+labels_path = os.path.join(spec_dir, 'labels.csv')
+
+# Читаем метки из labels.csv
+filename_to_label = {}
+with open(labels_path, 'r', encoding='utf-8') as csvfile:
+    reader = csv.DictReader(csvfile)
+    for row in reader:
+        filename_to_label[row['filename']] = row['label']
+
 X = []
 y = []
 emotions = set()
 
 for file in os.listdir(spec_dir):
-    if file.endswith('.npy'):
-        label = file.split('_')[0]
+    if file.endswith('.npy') and file in filename_to_label:
+        label = filename_to_label[file]
         spec_path = os.path.join(spec_dir, file)
         mel_db = np.load(spec_path)
         # Приводим к двумерному виду
@@ -34,11 +44,11 @@ for file in os.listdir(spec_dir):
 
 emotions = sorted(list(emotions))
 X = np.array(X)
-y = np.array([emotions.index(lbl) for lbl in y])
+y_indices = np.array([emotions.index(lbl) for lbl in y])
 
 if len(X) < 2:
     raise ValueError('Недостаточно данных для обучения модели!')
 
-clf = RandomForestClassifier(n_estimators=100, random_state=42)
-clf.fit(X, y)
+clf = RandomForestClassifier(n_estimators=50, random_state=42, max_depth=16)
+clf.fit(X, y_indices)
 joblib.dump({'model': clf, 'emotions': emotions}, 'models/rf_emotions.pkl')

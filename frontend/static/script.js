@@ -50,13 +50,145 @@ const historyTable = document.getElementById('history-table').querySelector('tbo
 const historyTableWrapper = document.getElementById('history-table').parentElement;
 let historyRecords = [];
 
-function addHistoryRecord(filename, duration, emotion, model) {
+// Chart.js динамически подгружаем
+(function loadChartJs() {
+    if (!window.Chart) {
+        const script = document.createElement('script');
+        script.src = 'https://cdn.jsdelivr.net/npm/chart.js';
+        document.head.appendChild(script);
+    }
+})();
+
+// Модалка для диаграммы
+const chartModal = document.getElementById('chart-modal');
+const closeChartModal = document.getElementById('close-chart-modal');
+const emotionsPieChartCanvas = document.getElementById('emotions-pie-chart');
+const emotionsValuesDiv = document.getElementById('emotions-values');
+let chartInstance = null;
+
+closeChartModal.onclick = function() {
+    chartModal.style.display = 'none';
+    if (chartInstance) { chartInstance.destroy(); chartInstance = null; }
+};
+window.onclick = function(event) {
+    if (event.target === chartModal) {
+        chartModal.style.display = 'none';
+        if (chartInstance) { chartInstance.destroy(); chartInstance = null; }
+    }
+};
+
+// Храним вероятности для каждой записи
+let historyProbs = [];
+
+// Модифицируем обработчик кнопки Старт
+const startBtn = document.querySelector('.start-btn');
+const loaderOverlay = document.getElementById('loader-overlay');
+function showLoader() { loaderOverlay.style.display = 'flex'; }
+function hideLoader() { loaderOverlay.style.display = 'none'; }
+startBtn.addEventListener('click', async () => {
+    hideError();
+    if (!recordedBlob) {
+        showError('Сначала запишите или импортируйте аудио');
+        return;
+    }
+    const selectedModel = document.getElementById('dropdownToggle').textContent;
+    if (selectedModel === 'Выбрать режим') {
+        showError('Выберите модель для анализа');
+        return;
+    }
+    try {
+        showLoader();
+        const result = await sendDataToServer(recordedBlob, selectedModel);
+        let filename = recordedBlob.name || generateRecordName();
+        let duration = '-';
+        if (typeof recordedBlob.duration !== 'undefined') {
+            duration = recordedBlob.duration;
+        } else {
+            duration = await getAudioDuration(recordedBlob);
+            duration = (duration && isFinite(duration)) ? duration.toFixed(2) : '-';
+        }
+        addHistoryRecord(filename, duration, result.emotion || '-', result.model || selectedModel, result.probs || null);
+    } catch (error) {
+        showError('Произошла ошибка при обработке аудио');
+    } finally {
+        hideLoader();
+    }
+});
+
+// Получение длительности аудио
+function getAudioDuration(blob) {
+    return new Promise(resolve => {
+        const audio = document.createElement('audio');
+        audio.preload = 'metadata';
+        audio.onloadedmetadata = function() {
+            resolve(audio.duration);
+        };
+        audio.onerror = function() {
+            resolve(0);
+        };
+        audio.src = URL.createObjectURL(blob);
+    });
+}
+
+// Очистка истории по кнопке Очистка
+const clearBtn = document.getElementById('clearBtn');
+clearBtn.addEventListener('click', () => {
+    clearCanvas();
+    recordedChunks = [];
+    recordedBlob = null;
+    document.getElementById('listenBtn').style.display = 'none';
+    clearHistoryTable();
+});
+
+function addHistoryRecord(filename, duration, emotion, model, probs) {
     // Проверка на дубликаты по названию файла и эмоции и модели
     if (historyRecords.some(r => r.filename === filename && r.emotion === emotion && r.model === model)) return;
     historyRecords.push({ filename, duration, emotion, model });
+    historyProbs.push(probs || null);
     const row = document.createElement('tr');
-    row.innerHTML = `<td>${filename}</td><td>${duration}</td><td>${emotion}</td><td>${model}</td>`;
+    row.innerHTML = `<td>${filename}</td><td>${duration}</td><td class="emotion-cell">${emotion}</td><td>${model}</td>`;
     historyTable.appendChild(row);
+    // Добавляем обработчик клика по эмоции
+    const emotionCell = row.querySelector('.emotion-cell');
+    if (emotionCell) {
+        emotionCell.style.cursor = 'pointer';
+        emotionCell.onclick = () => {
+            const idx = Array.from(historyTable.children).indexOf(row);
+            const probs = historyProbs[idx];
+            if (probs && window.Chart) {
+                showPieChart(probs);
+            }
+        };
+    }
+}
+
+function showPieChart(probs) {
+    chartModal.style.display = 'flex';
+    if (chartInstance) { chartInstance.destroy(); }
+    const labels = Object.keys(probs);
+    const values = Object.values(probs);
+    chartInstance = new Chart(emotionsPieChartCanvas, {
+        type: 'pie',
+        data: {
+            labels: labels,
+            datasets: [{
+                data: values,
+                backgroundColor: [
+                    '#007bff', '#28a745', '#ffc107', '#dc3545', '#17a2b8', '#6f42c1', '#fd7e14', '#20c997'
+                ],
+            }]
+        },
+        options: {
+            responsive: false,
+            plugins: { legend: { position: 'bottom' } }
+        }
+    });
+    // Числовые значения
+    let html = '<b>Значения:</b><br>';
+    labels.forEach((label, i) => {
+        html += `${label}: <b>${(values[i]*100).toFixed(2)}%</b><br>`;
+    });
+    emotionsValuesDiv.innerHTML = html;
 }
 
 function clearHistoryTable() {
@@ -296,58 +428,3 @@ async function sendDataToServer(audioBlob, model) {
         throw error;
     }
 }
-
-// Модифицируем обработчик кнопки Старт
-const startBtn = document.querySelector('.start-btn');
-startBtn.addEventListener('click', async () => {
-    hideError();
-    if (!recordedBlob) {
-        showError('Сначала запишите или импортируйте аудио');
-        return;
-    }
-    const selectedModel = document.getElementById('dropdownToggle').textContent;
-    if (selectedModel === 'Выбрать режим') {
-        showError('Выберите модель для анализа');
-        return;
-    }
-    try {
-        const result = await sendDataToServer(recordedBlob, selectedModel);
-        // Получаем имя файла и длительность
-        let filename = recordedBlob.name || generateRecordName();
-        let duration = '-';
-        if (typeof recordedBlob.duration !== 'undefined') {
-            duration = recordedBlob.duration;
-        } else {
-            duration = await getAudioDuration(recordedBlob);
-            duration = (duration && isFinite(duration)) ? duration.toFixed(2) : '-';
-        }
-        addHistoryRecord(filename, duration, result.emotion || '-', result.model || selectedModel);
-    } catch (error) {
-        showError('Произошла ошибка при обработке аудио');
-    }
-});
-
-// Получение длительности аудио
-function getAudioDuration(blob) {
-    return new Promise(resolve => {
-        const audio = document.createElement('audio');
-        audio.preload = 'metadata';
-        audio.onloadedmetadata = function() {
-            resolve(audio.duration);
-        };
-        audio.onerror = function() {
-            resolve(0);
-        };
-        audio.src = URL.createObjectURL(blob);
-    });
-}
-
-// Очистка истории по кнопке Очистка
-const clearBtn = document.getElementById('clearBtn');
-clearBtn.addEventListener('click', () => {
-    clearCanvas();
-    recordedChunks = [];
-    recordedBlob = null;
-    document.getElementById('listenBtn').style.display = 'none';
-    clearHistoryTable();
-});
